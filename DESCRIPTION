@@ -1,0 +1,10 @@
+Package: ahw
+Type: Package
+Title: Re-weighting marked point processes based on additive hazard models. 
+Version: 0.1
+Date: 2016-11-02
+Author: Kjetil Røysland 
+Maintainer: Kjetil Røysland <kjetil.roysland@medisin.uio.no>
+Depends: timereg
+Description: More about what it does (maybe more than one line)
+License: What license is it under?
