@@ -4,7 +4,7 @@
 \title{
 Plots mean of time continous-time weights}
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Preliminary plot of mean of individual weight-trajectories
 }
 \usage{
 plotMean(weights, startTime, stopTime, pTimes)

@@ -4,7 +4,7 @@
 \title{
 Plots time-dependent weight-trajectories for several individuals}
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Preliminary plot of individual weight-trajectories
 }
 \usage{
 plotWeights(w, t, g, n = 100)
