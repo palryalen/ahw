@@ -2,12 +2,10 @@
 
 MakeCensWeights <- function(fFit, cfFit, data, startTimeName, stopTimeName,
                              endStatusName, intStatusName, idName) {
-        fRes <- aalenRes(fFit)
+        B <- aalenRes(fFit)
         cfRes <- aalenRes(cfFit)
-        names(fRes)[1] <- 'fRes.dM'
-        names(cfRes)[1] <- 'cfRes.dM'
-
-        B <- merge(fRes, cfRes, by=c('id','time'), all=T, sort=T)
+        names(B)[1] <- 'fRes.dM'
+        B$'cfRes.dM' <- cfRes$dM
          
         colnames(B)[which(names(B) == 'time')] <- stopTimeName 
         colnames(B)[which(names(B) == 'id')] <- paste('temp',idName,sep='.')
