@@ -1,5 +1,5 @@
 
-
+# Refining dataFr to include all the event times for the individuals at risk. Converts to data.table.
 refineTable <- function(dataFr,atRiskState,eventTimes){
         sortedEventTimes <- sort(eventTimes)
         baseTable <- as.data.table(dataFr)
@@ -12,11 +12,7 @@ refineTable <- function(dataFr,atRiskState,eventTimes){
         
         baseTable[,numRep :=numRep+1]
         
-        # Can be improved!
-        # if(class(baseTable$to.state) == "numeric")
-        #         baseTable[numRep>1,to.state:=0]
-        # if(class(baseTable$to.state) == "character")
-        #         baseTable[numRep>1,to.state:="0"]
+        # To be improved.?
         baseTable[,to.state:=as.character(to.state)]
         
         Table <- baseTable[rep(1:nrow(baseTable),times=baseTable[,numRep]),]
@@ -24,8 +20,6 @@ refineTable <- function(dataFr,atRiskState,eventTimes){
         # Insert event times where the frame is refined
         Table[,putEventTimes := 0]
         Table[numRep>1,putEventTimes := c(sortedEventTimes[sortedEventTimes>=from[1] & sortedEventTimes<to[1]],to[1]),by=id]
-        # idds <- idds+1;from <- Table[id==idds]$from;to <- Table[id==idds]$to;numRep<-Table[id==idds]$numRep;length(sortedEventTimes[sortedEventTimes>=from[1] & sortedEventTimes<=to[1]]);length(from)
-        # baseTable[id==idds];sortedEventTimes[sortedEventTimes>=from[1] & sortedEventTimes<=to[1]]
         Table[numRep==1,putEventTimes := to]
         
         Table[,to := putEventTimes]

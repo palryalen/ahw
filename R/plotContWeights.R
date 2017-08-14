@@ -1,6 +1,5 @@
 
-# fr <- frame
-
+# Plotting all the individual weight trajectories in fr, along with the mean
 plotContWeights <- function(fr,stopTimeName="to",startStatusName="from.state",endStatusName="to.state",idName="id"){
         
         namesMatch <- match(c(startStatusName,endStatusName,stopTimeName,idName),names(fr))
@@ -23,9 +22,7 @@ plotContWeights <- function(fr,stopTimeName="to",startStatusName="from.state",en
         ylm <- c(max(c(0, min(fr$weights))), min(c(5, max(fr$weights))))
         plot(tms,wt,type="l",xlim=c(0,tmx),ylim=ylm,col="grey",xlab="time",ylab="weights")
         for(i in 2:numIds){
-                # wt <- sapply(tms,function(tm)tail(fr$weights[fr$id==idNs[i] & fr$to < tm],1))
-                # lines(tms,wt,col="grey")
-                
+
                 wtIn <- fr$weights[fr$id==idNs[i]]
                 wt <- rep(NA,length(tms));wt[1]<-1
                 wt[match(fr[id==idNs[i]]$to,tms)] <- wtIn
@@ -40,5 +37,4 @@ plotContWeights <- function(fr,stopTimeName="to",startStatusName="from.state",en
         wpr <- wpr/numIds
         lines(tms,wpr,col="red")
         cat('Mean weights: ',mean(wpr))
-        # print(summary(fr$weights))
 }

@@ -1,3 +1,4 @@
+# Replaces NA values in vec with last non-NA element
 # Assumes the first position in vec is not NA
 # Can be replaced by zoo::na.locf0
 naReplace <- function(vec){
