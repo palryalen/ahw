@@ -3,9 +3,11 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 %%  ~~function to do ... ~~
+Plots mean and individual weight trajectories.
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Plots weights for assessment.
 }
 \usage{
 plotContWeights(fr, stopTimeName = "to", startStatusName = "from.state", endStatusName = "to.state", idName = "id")
@@ -14,22 +16,26 @@ plotContWeights(fr, stopTimeName = "to", startStatusName = "from.state", endStat
 \arguments{
   \item{fr}{
 %%     ~~Describe \code{fr} here~~
+Data with weight column
 }
-  \item{stopTimeName}{
-%%     ~~Describe \code{stopTimeName} here~~
+
+ \item{stopTimeName}{
+Name of column with stop time of the at risk period,
 }
-  \item{startStatusName}{
-%%     ~~Describe \code{startStatusName} here~~
+\item{startStatusName}{
+Name of the variable that contains the name of start state for each at-risk interval,
 }
-  \item{endStatusName}{
-%%     ~~Describe \code{endStatusName} here~~
+\item{endStatusName}{
+Name of the variable that contains the name of end state for each at-risk interval,
 }
   \item{idName}{
-%%     ~~Describe \code{idName} here~~
+Name of column in \code{dataFr} that identifies individuals,
 }
+
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
+The mean should be close to 1, and the individual trajectories should not be extreme(i.e. negative or large).
 }
 \value{
 %%  ~Describe the value returned
@@ -43,6 +49,7 @@ plotContWeights(fr, stopTimeName = "to", startStatusName = "from.state", endStat
 }
 \author{
 %%  ~~who you are~~
+Pål Christie Ryalen <p.c.ryalen@medisin.uio.no>
 }
 \note{
 %%  ~~further notes~~

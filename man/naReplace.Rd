@@ -3,9 +3,11 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 %%  ~~function to do ... ~~
+Replaces NA-values in \code{vec} with last non-NA value.
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Assumes first element is non-NA
 }
 \usage{
 naReplace(vec)
@@ -13,6 +15,7 @@ naReplace(vec)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{vec}{
+  Vector of any type
 %%     ~~Describe \code{vec} here~~
 }
 }
@@ -31,6 +34,7 @@ naReplace(vec)
 }
 \author{
 %%  ~~who you are~~
+Pål Christie Ryalen <p.c.ryalen@medisin.uio.no>
 }
 \note{
 %%  ~~further notes~~
@@ -42,20 +46,8 @@ naReplace(vec)
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (vec) 
-{
-    naIds <- which(!is.na(vec))
-    tab <- data.table(vec = vec, notNa = 0)
-    tab[, `:=`(notNa, cumsum(!is.na(vec)))]
-    tab[, `:=`(filledVec, vec[1]), by = notNa]
-    vec <- tab$filledVec
-    return(vec)
-  }
+naReplace(c(1,2,3,NA,NA,4))
+naReplace(c("text",NA,NA))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
