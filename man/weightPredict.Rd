@@ -17,15 +17,31 @@ weightPredict(fPred, cfPred, wtFrame, ids, eventTimes, eventIds, b)
 fPred, cfPred, wtFrame, ids, eventTimes, eventIds, b)
   \item{fPred}{
 %%     ~~Describe \code{dataFr} here~~
-data.frame or data.table on long format
+\code{\link{predict.aalen}} object of the factual fit
 }
-  \item{atRiskState}{
-%%     ~~Describe \code{atRiskState} here~~
-At risk state(s) 
+\item{cfPred}{
+%%     ~~Describe \code{dataFr} here~~
+\code{\link{predict.aalen}} object of the counterfactual fit
+}
+\item{wtFrame}{
+%%     ~~Describe \code{dataFr} here~~
+\code{\link{data.frame}} or \code{\link{data.table}} for the at risk individuals
+}
+\item{ids}{
+%%     ~~Describe \code{dataFr} here~~
+All individuals in the data set
 }
   \item{eventTimes}{
 %%     ~~Describe \code{eventTimes} here~~
 Observed event times 
+}
+\item{eventIds}{
+%%     ~~Describe \code{dataFr} here~~
+Individuals that experience the event
+}
+\item{b}{
+%%     ~~Describe \code{dataFr} here~~
+Smoothing parameter
 }
 }
 \details{
@@ -87,5 +103,5 @@ function (dataFr, atRiskState, eventTimes)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
+\keyword{ internal }% use one of  RShowDoc("KEYWORDS")
 \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
