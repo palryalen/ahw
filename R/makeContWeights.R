@@ -11,6 +11,9 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,stopTimeN
         saveNames <- names(dataFr)[namesMatch]
         names(dataFr)[namesMatch] <- c("from.state","to.state","to","id")
         
+        # Add noise to tied times
+        dataFr <- addNoiseAtEventTimes(dataFr,"id","from","to")
+        
         # data frame to get predictions along
         wtFrame <- dataFr[dataFr$from.state %in% atRiskState,]
         
