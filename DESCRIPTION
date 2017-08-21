@@ -1,12 +1,19 @@
 Package: ahw
 Type: Package
-Title: Re-weighting marked point processes based on additive hazard models
-Version: 0.2
+Title: Re-weighting point processes based on additive hazard models.
+Version: 0.0.0.9000
 Date: 2016-11-02
-Author: Kjetil Røysland
-Maintainer: Kjetil Røysland <kjetil.roysland@medisin.uio.no>
+Author: Kjetil Røysland, contributions from Pål Christie Ryalen
+Maintainer: Kjetil Røysland <kjetil.roysland@medisin.uio.no>,
+            Pål Christie Ryalen <p.c.ryalen@medisin.uio.no>
 Depends:
-    timereg
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
-RoxygenNote: 5.0.1
+    timereg (>= 1.9.1),
+    R (>= 3.3.1)
+Imports: 
+    data.table (>= 1.10.4)
+LazyData: Yes
+Description: Estimates continuous time weights for performing causal survival
+             analysis. For instance, weighted Nelson-Aalen or Kaplan-Meier
+             estimates can be given a causal interpretation.
+License: CC BY-NC 4.0
+RoxygenNote: 6.0.1

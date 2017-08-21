@@ -86,30 +86,23 @@ Pål Christie Ryalen <p.c.ryalen@medisin.uio.no>
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-function (dataFr, atRiskState, eventTimes) 
-{
-    sortedEventTimes <- sort(eventTimes)
-    baseTable <- as.data.table(dataFr)
-    baseTable$rowNumber <- 1:nrow(baseTable)
-    baseTable[, `:=`(isAtRisk, 1 * (from.state \%in\% atRiskState))]
-    baseTable[, `:=`(numRep, 0)]
-    baseTable[isAtRisk == 1, `:=`(numRep, as.numeric(sum(from <= 
-        eventTimes & to > eventTimes))), by = rowNumber]
-    baseTable[, `:=`(numRep, numRep + 1)]
-    baseTable[, `:=`(to.state, as.character(to.state))]
-    Table <- baseTable[rep(1:nrow(baseTable), times = baseTable[, 
-        numRep]), ]
-    Table[, `:=`(putEventTimes, 0)]
-    Table[numRep > 1, `:=`(putEventTimes, c(sortedEventTimes[sortedEventTimes >= 
-        from[1] & sortedEventTimes < to[1]], to[1])), by = id]
-    Table[numRep == 1, `:=`(putEventTimes, to)]
-    Table[, `:=`(to, putEventTimes)]
-    Table[, `:=`(from, c(from[1], to[-length(to)])), by = id]
-    Table[, `:=`(to.state, c(rep(0, length(to) - 1), baseTable$to.state[rowNumber[1]])), 
-        by = rowNumber]
-    return(Table)
-  }
+data(fFrame)
+data(cfFrame)
+
+faFit <- aalen(Surv(from,to,to.state=="Censored") ~ 1 + u, data = fFrame,resample.iid = 1 ,n.sim=0)
+cfaFit <- aalen(Surv(from,to,to.state=="Censored") ~ 1, data = fFrame,resample.iid = 1,n.sim=0)
+
+frame <- makeContWeights(faFit,cfaFit,fFrame,"Alive","Censored","to","from.state","to.state","id",100)
+
+fMod <- aalen(Surv(from,to,to.state=="Dead")~1,data=fFrame)
+wMod <- aalen(Surv(from,to,to.state=="Dead")~1,data=frame,weights = frame$weights)
+cfMod <- aalen(Surv(from,to,to.state=="Dead")~1,data=cfFrame)
+
+plot(fMod$cum,type="s",main="Nelson-Aalen for death",ylab="")
+lines(cfMod$cum,type="s",col="blue")
+lines(wMod$cum,type="s",col="red")
+legend("topleft",c("factual","counterfactual","weighted factual"),lty=1,col=c(1,"blue","red"),bty="n")
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

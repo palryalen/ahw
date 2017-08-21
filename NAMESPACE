@@ -1,4 +1,3 @@
 exportPattern("^[[:alpha:]]+")
 useDynLib(ahw)
 import(data.table)
-
