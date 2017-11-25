@@ -40,16 +40,10 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,stopTimeN
         
         
         # Truncate weights that are outside a given range
-        removeIds <- unique(Table$id[ Table$weights < weightRange[1] | Table$weights > weightRange[2]])
-        Table <- Table[!(Table$id %in% removeIds),]
+        Table$weights[Table$weights < weightRange[1]] <- weightRange[1]
+        Table$weights[Table$weights > weightRange[2]] <- weightRange[2]
         
-        
-        if(length(removeIds) > 0 & length(removeIds) < 20)
-                cat('Removed ',idName,"'s: ",sep="");cat(removeIds,"\n")
-        if(length(removeIds) >= 20)
-                cat('Removed ',length(removeIds)," ",idName,"'s","\n",sep="")
-        
-        # Optional plot of the weights
+        # Optional plot of the weight trajectories
         if(willPlotWeights == T)
                 plotContWeights(Table)
         
