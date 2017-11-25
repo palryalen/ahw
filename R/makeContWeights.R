@@ -39,7 +39,7 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,stopTimeN
         Table <- subset(Table,select= !(names(Table) %in% c("rowNumber","numRep","putEventTimes","isAtRisk")))
         
         
-        # Remove individuals whose weights are outside a given range
+        # Truncate weights that are outside a given range
         removeIds <- unique(Table$id[ Table$weights < weightRange[1] | Table$weights > weightRange[2]])
         Table <- Table[!(Table$id %in% removeIds),]
         
