@@ -73,6 +73,7 @@ weightPredict <- function(fPred,cfPred,wtFrame,ids,eventTimes,eventIds,b){
                 cat('Warning: b is small for', numNaIds, 'individuals \n')
                 
         predTable[jumpTerm %in% c(NA,NaN),jumpTerm:= 0]
+        predTable[jumpTerm %in% c(Inf),jumpTerm:= 0]
         
         # Weight calculation
         predTable[,preweight := 1 + dA_f - dA_cf + jumpTerm]
