@@ -31,12 +31,10 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,stopTimeN
         # Obtain estimated weights
         weightFrame <- weightPredict(pft,cpft,wtFrame,ids,eventTimes,eventIds,b)
 
-        names(weightFrame)[2] <- "to"
-
         # Refining the data frame for individuals at risk
         Table <- refineTable(dataFr,atRiskState,eventTimes)
         
-        Table <- merge(Table,weightFrame,by=c("id","to"),all.x=T)
+        Table <- merge(Table,weightFrame,by=c("id","from"),all.x=T)
         
         Table <- subset(Table,select= !(names(Table) %in% c("rowNumber","numRep","putEventTimes","isAtRisk")))
         
