@@ -11,8 +11,10 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,stopTimeN
         saveNames <- names(dataFr)[namesMatch]
         names(dataFr)[namesMatch] <- c("from.state","to.state","to","id")
         
+        dataFr <- as.data.table(dataFr)
+
         # Add noise to tied times
-        # dataFr <- addNoiseAtEventTimes(dataFr,"id","from","to")
+        dataFr <- addNoiseAtEventTimes(dataFr,"id","from","to")
         
         # data frame to get predictions along
         wtFrame <- dataFr[dataFr$from.state %in% atRiskState,]
@@ -21,7 +23,7 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,stopTimeN
         pft <- predict(faFit,newdata=wtFrame,n.sim=0,se=F,resample.iid=0)
         cpft <- predict(cfaFit,newdata=wtFrame,n.sim=0,se=F,resample.iid=0)
         
-        ids <- unique(dataFr[,idName])
+        ids <- unique(dataFr[,idName,with=F])
         eventIds <- wtFrame$id[wtFrame$to.state %in% eventState]
         
         # Times we want to estimate the weights at
@@ -29,14 +31,33 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,stopTimeN
         sortedEventTimes <- sort(eventTimes)
         
         # Obtain estimated weights
+        pft -> fPred; cpft -> cfPred;
         weightFrame <- weightPredict(pft,cpft,wtFrame,ids,eventTimes,eventIds,b)
 
         # Refining the data frame for individuals at risk
-        Table <- refineTable(dataFr,atRiskState,eventTimes)
+        Table <- refineTableAllTimes(dataFr,atRiskState,eventState)
         
         Table <- merge(Table,weightFrame,by=c("id","from"),all.x=T)
         
-        Table <- subset(Table,select= !(names(Table) %in% c("rowNumber","numRep","putEventTimes","isAtRisk")))
+        
+        # Individuals weight constant after time of treatment
+        Table[to > eventTime,weights := weights[1],by=id]
+        
+        
+        ##
+        # Table[isAtRisk==0, weights:=tail(weights,1) ,by=id]
+        ##
+        
+        ##
+        # Table[,tail(to,1):=tail(to,1)+1e-2*runif(1),by=id]
+        ##
+        
+        # idds <- 0
+        # idds <- idds+1
+        # Table[id==idds & from > eventTimes[idds+1]-1]
+        # plot(Table[id==idds]$to,Table[id==idds]$weights,type="l")
+        
+        Table <- subset(Table,select= !(names(Table) %in% c("rowNumber","numRep","putEventTimes","isAtRisk","u","eventTime")))
         
         Table[,weights:=naReplace(weights),by=id]
 
