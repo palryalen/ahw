@@ -38,11 +38,15 @@ weightPredict <- function(fPred,cfPred,wtFrame,ids,eventTimes,eventIds,b){
         
         wtFrame$rowNum <- 1:nrow(wtFrame)
         
+        # to <- predTable[id==idds]$to
         predTable[,numIdRow:= rep(cumsum(numRepId),times=nTimes*numRepId)]
         predTable[,keep:=1*(to>= wtFrame$from[rowNum[1]==wtFrame$rowNum] & 
                                     to< wtFrame$to[rowNum[1]==wtFrame$rowNum]),by=rowNum]
         predTable[keep==0 & numIdRow==rowNum,keep:=1*(to>= max(wtFrame$to[id[1]==wtFrame$id])),by=id]
-        predTable[to==0,keep:=1]
+        
+        # NB! Not keep every row that starts at to=0!
+        # predTable[to==0,keep:=1]
+        predTable[to==0 & numIdRow != rowNum,keep:=1]
         
         predTable <- predTable[keep==1]
         
