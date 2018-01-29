@@ -1,23 +1,19 @@
 
+# Assumes fr is data.table
+addNoiseAtEventTimes <- function(fr,idName,startTimeName,stopTimeName){
+        
+        fr$noise <- 1e-4*runif(nrow(fr))
+        fr[,noise:=cumsum(noise),by=id]
+        fr$noiseFrom <- fr[,startTimeName,with=F]
+        fr$noiseTo <- fr[,stopTimeName,with=F]
+        fr[,noiseFrom:=noiseFrom + c(0,noise[-length(noise)]),by=id]
+        fr[,noiseTo := noiseTo + noise,by=id]
+        fr[,startTimeName] <- fr$noiseFrom
+        fr[,stopTimeName] <- fr$noiseTo
+        
+        fr <- subset(fr,select = !(names(fr) %in% c("noise","noiseFrom","noiseTo") ))
+        
+        
+        return(fr)
 
-# Remove ties by adding noise
-addNoiseAtEventTimes <- function(frame,idName,startTimeName,stopTimeName){
-  ids <- unique(frame[,idName][frame[,startTimeName] >=  frame[,stopTimeName] |
-                                 duplicated(frame[,stopTimeName]) ])
-  
-  eps <- min(abs(diff( c(frame[,stopTimeName],frame[,startTimeName] ))))
-  noiseapply <- function(idds){
-    subfr <- frame[frame[,idName] == idds,]
-    allTimes <- subfr[,stopTimeName]
-    allTimes <- allTimes + 1e-2*eps*runif(length(allTimes))
-    
-    subfr[,startTimeName] <- c(subfr[1,startTimeName],allTimes[-length(allTimes)])
-    subfr[,stopTimeName] <- allTimes
-    return(subfr)
-  }
-  
-  noiseFrame <- lapply(ids,noiseapply)
-  noiseFrame <- do.call(rbind,noiseFrame)
-  frame[frame$id %in% ids,] <- noiseFrame
-  return(frame)
 }
