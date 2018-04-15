@@ -25,6 +25,15 @@ devtools::install_github("palryalen/ahw").
 
 You can also download the source from this page and build the package manually.
 
+
+## Examples
+
+```
+library(ahw)
+
+example(makeContWeights)
+```
+
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning.
