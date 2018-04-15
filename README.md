@@ -1,6 +1,6 @@
 # ahw
 
-```R``` package for performing continuous-time weight<sup>[1](#cont_msm)</sup> estimation based on Aalens additive hazard model. The weights, and weighted additive hazard regressions are consistent<sup>[2](#additive_consistent)</sup>. Moreover, (weighted) additive hazard estimates can be transformed to estimate other parameters consistently<sup>[3](#transforming)</sup>, paving the way for causal survival analysis.
+```R``` package for performing continuous-time weight<sup>[1](#cont_msm)</sup> estimation based on Aalens additive hazard model. The weights, and weighted additive hazard regressions are consistent<sup>[2](#additive_consistent)</sup>. Moreover, (weighted) additive hazard estimates can be transformed for estimating other parameters consistently<sup>[3](#transforming)</sup>, paving the way for causal survival analysis.
 
 ## Getting Started
 
