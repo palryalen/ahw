@@ -20,8 +20,10 @@ It is an advantage to be familiar with ```timereg::aalen```
 Make sure to have the ``devtools`` package installed. Then run
 
 ```
-devtools::install_github("palryalen/ahw")
+devtools::install_github("palryalen/ahw").
 ```
+
+You can also download the source from this page and build the package manually.
 
 ## Versioning
 
@@ -38,7 +40,7 @@ This project is licensed under the Creative Commons Attribution-NonCommercial 4.
 *Share — copy and redistribute the material in any medium or format
 *Adapt — remix, transform, and build upon the material
 
-<a name="cont_msm">1</a>: Kjetil Røysland (2011), *A martingale approach to continuous-time marginal structural models*, Bernoulli, [link](https://projecteuclid.org/euclid.bj/1310042849)
+<a name="cont_msm">1</a>: Kjetil Røysland, [*A martingale approach to continuous-time marginal structural models*](https://projecteuclid.org/euclid.bj/1310042849), Bernoulli
 
 
 <a name="additive_consistent">2</a>: Pål Ryalen, Mats Stensrud, Kjetil Røysland, [*The additive hazard estimator is consistent for continuous time marginal structural models*](https://arxiv.org/abs/1802.01946) 
