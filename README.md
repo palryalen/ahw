@@ -1,6 +1,6 @@
 # ahw
 
-Continuous-time weight<sup>[1](#cont_msm)</sup> estimation based on Aalens additive hazard model. The weights, and weighted additive hazard regressions are consistent<sup>[2](#additive_consistent)</sup>. Moreover, (weighted) additive hazard estimates can be transformed to estimate other parameters consistently<sup>[3](#transforming)</sup>, paving the way for causal survival analysis.
+```R``` package for performing continuous-time weight<sup>[1](#cont_msm)</sup> estimation based on Aalens additive hazard model. The weights, and weighted additive hazard regressions are consistent<sup>[2](#additive_consistent)</sup>. Moreover, (weighted) additive hazard estimates can be transformed to estimate other parameters consistently<sup>[3](#transforming)</sup>, paving the way for causal survival analysis.
 
 ## Getting Started
 
@@ -35,10 +35,14 @@ We use [SemVer](http://semver.org/) for versioning.
 
 ## License
 
-This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) licence. You are therefore free to [free to](https://creativecommons.org/licenses/by-nc/4.0/)
+This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) licence. You are therefore [free to](https://creativecommons.org/licenses/by-nc/4.0/)
 
-*Share — copy and redistribute the material in any medium or format
-*Adapt — remix, transform, and build upon the material
+* Share — copy and redistribute the material in any medium or format
+
+* Adapt — remix, transform, and build upon the material
+
+
+## References
 
 <a name="cont_msm">1</a>: Kjetil Røysland, [*A martingale approach to continuous-time marginal structural models*](https://projecteuclid.org/euclid.bj/1310042849), Bernoulli
 
