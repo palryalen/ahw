@@ -48,7 +48,7 @@ refineTableAllTimes <- function(dataFr,atRiskState,eventState){
         # Table[numRep>1,putEventTimes := c(sortedFineRefineTimes[sortedFineRefineTimes>=from[1] & sortedFineRefineTimes<to[1]],to[1]),by=id]
         # Table[numRep==1,putEventTimes := to]
         
-        ##
+        ## NB! Check the following line: Is the putEventTimes correct?
         Table[,putEventTimes := c(sortedFineRefineTimes[sortedFineRefineTimes>from[1] & sortedFineRefineTimes<to[1]],to[1]),by=rowNumber]
         # Table[from.state %in% atRiskState,putEventTimes := c(sortedFineRefineTimes[sortedFineRefineTimes>from[1] & sortedFineRefineTimes<to[1]],to[1]),by=rowNumber]
         # Table[!(from.state %in% atRiskState),putEventTimes := c(sortedFineRefineTimes[sortedFineRefineTimes>from[1] & sortedFineRefineTimes<to[1]],to[1]),by=rowNumber]
