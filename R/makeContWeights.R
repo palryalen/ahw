@@ -39,6 +39,7 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,stopTimeN
         
         Table <- merge(Table,weightFrame,by=c("id","from"),all.x=T)
         
+        Table[isAtRisk!=1]$to <- baseTable[!(from.state %in% atRiskState)]$to
         
         # Individuals weight constant after time of treatment
         Table[to > eventTime,weights := weights[1],by=id]

@@ -6,7 +6,8 @@ refineTableAllTimes <- function(dataFr,atRiskState,eventState){
         
         # Refine at all times after being at risk
         ##
-        fineRefineTimes <- c(0,baseTable$to[baseTable$from.state %in% c(atRiskState,eventState)])
+        # fineRefineTimes <- c(0,baseTable$to[baseTable$from.state %in% c(atRiskState,eventState)])
+        fineRefineTimes <- c(0,baseTable$to[baseTable$from.state %in% c(atRiskState)])
         ##
         
         baseTable$rowNumber <- 1:nrow(baseTable)
@@ -15,10 +16,10 @@ refineTableAllTimes <- function(dataFr,atRiskState,eventState){
         # baseTable[,isAtRisk:=1*(from.state %in% atRiskState)]
         ##
         
-        baseTable[,isAtRisk:=1*(from.state %in% c(atRiskState,eventState))]
+        baseTable[,isAtRisk:=1*(from.state %in% c(atRiskState))]
         
         
-        baseTable[,numRep := 0]
+        baseTable[,numRep := 1]
         
         ##
         # baseTable[isAtRisk==1,numRep := as.numeric(sum(from <= eventTimes & to > eventTimes)),by=rowNumber]
@@ -49,7 +50,7 @@ refineTableAllTimes <- function(dataFr,atRiskState,eventState){
         # Table[numRep==1,putEventTimes := to]
         
         ## NB! Check the following line: Is the putEventTimes correct?
-        Table[,putEventTimes := c(sortedFineRefineTimes[sortedFineRefineTimes>from[1] & sortedFineRefineTimes<to[1]],to[1]),by=rowNumber]
+        Table[isAtRisk==1,putEventTimes := c(sortedFineRefineTimes[sortedFineRefineTimes>from[1] & sortedFineRefineTimes<to[1]],to[1]),by=rowNumber]
         # Table[from.state %in% atRiskState,putEventTimes := c(sortedFineRefineTimes[sortedFineRefineTimes>from[1] & sortedFineRefineTimes<to[1]],to[1]),by=rowNumber]
         # Table[!(from.state %in% atRiskState),putEventTimes := c(sortedFineRefineTimes[sortedFineRefineTimes>from[1] & sortedFineRefineTimes<to[1]],to[1]),by=rowNumber]
         # Table[from.state==atRiskState,putEventTimes := c(sortedFineRefineTimes[sortedFineRefineTimes>=from[1] & sortedFineRefineTimes<to[1]],to[1]),by=rowNumber]
