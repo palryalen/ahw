@@ -3,8 +3,8 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,stopTimeN
         
         if(class(faFit) != "aalen" | class(cfaFit) != "aalen")
           stop("The survival fits must be of type aalen.",call. = F)
-        # if(!requireNamespace("data.table",quietly = T))
-        #   stop("The data.table package is needed for this function to work. Please install it.",call. = F)
+        if(!requireNamespace("data.table",quietly = T))
+          stop("The data.table package is needed for this function to work. Please install it.",call. = F)
   
         # Making new names for convenience
         namesMatch <- match(c(startStatusName,endStatusName,stopTimeName,idName),names(dataFr))
@@ -31,34 +31,20 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,stopTimeN
         sortedEventTimes <- sort(eventTimes)
         
         # Obtain estimated weights
-        pft -> fPred; cpft -> cfPred;
         weightFrame <- weightPredict(pft,cpft,wtFrame,ids,eventTimes,eventIds,b)
 
-        # Refining the data frame for individuals at risk
-        Table <- refineTableAllTimes(dataFr,atRiskState,eventState)
+        # Refining the data.frame for individuals at risk
+        Table <- refineTable(dataFr,atRiskState,eventState)
         
+        # Merge so that Table includes the weight estimates 
         Table <- merge(Table,weightFrame,by=c("id","from"),all.x=T)
         
-        Table[isAtRisk!=1]$to <- baseTable[!(from.state %in% atRiskState)]$to
-        
         # Individuals weight constant after time of treatment
-        Table[to > eventTime,weights := weights[1],by=id]
+        Table[isAtRiskForTreatment != 1,weights := weights[1],by=id]
         
         
-        ##
-        # Table[isAtRisk==0, weights:=tail(weights,1) ,by=id]
-        ##
         
-        ##
-        # Table[,tail(to,1):=tail(to,1)+1e-2*runif(1),by=id]
-        ##
-        
-        # idds <- 0
-        # idds <- idds+1
-        # Table[id==idds & from > eventTimes[idds+1]-1]
-        # plot(Table[id==idds]$to,Table[id==idds]$weights,type="l")
-        
-        Table <- subset(Table,select= !(names(Table) %in% c("rowNumber","numRep","putEventTimes","isAtRisk","u","eventTime")))
+        Table <- subset(Table,select= !(names(Table) %in% c("rowNumber","numRep","putEventTimes","isAtRiskForTreatment","eventTime")))
         
         Table[,weights:=naReplace(weights),by=id]
 
