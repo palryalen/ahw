@@ -3,16 +3,16 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 %%  ~~function to do ... ~~
-Continuous time weight estimation based on aalen.predict
+Continuous time weight estimation based on \code{aalen.predict}
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
-Refines data longitudinally in order to do estimate parameters(e.g. Nelson-Aalen or Kaplan-Meier) using continuous time weights. Weight assessment is biult in throug plotting options and removal of extreme(very largs or negative) weights.
+Refines data longitudinally in order to do estimate parameters(e.g. Nelson-Aalen or Kaplan-Meier) using continuous time weights. The weights can be assessed using the plot option.
 }
 \usage{
 function (faFit, cfaFit, dataFr, atRiskState, eventState, stopTimeName, 
-    startStatusName, endStatusName, idName, b, weightRange = c(0, 
-        10), willPlotWeights = T) 
+    startStatusName, endStatusName, idName, b, weightRange = c(0, 10),
+    willPlotWeights = T) 
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
