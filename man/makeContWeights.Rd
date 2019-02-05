@@ -20,25 +20,25 @@ function (faFit, cfaFit, dataFr, atRiskState, eventState, stopTimeName,
 The \code{\link[timereg]{aalen}} fit for the factual hazard,
 }
   \item{cfaFit}{
-The  \code{\link[timereg]{aalen}} fit for the counterfactual hazard,
+The  \code{\link[timereg]{aalen}} fit for the hypothetical hazard,
 }
   \item{dataFr}{
 \code{\link{data.frame}} or \code{\link{data.table}} on long format,
 }
  \item{atRiskState}{
-At risk state for the event,
+At risk state for the event of interest,
 }
 \item{eventState}{
-State for the event,
+State for the event of interest,
 }
  \item{stopTimeName}{
 Name of column with stop time of the at risk period,
 }
 \item{startStatusName}{
-Name of the variable that contains the name of start state for each at-risk interval,
+Name of the column that contains the starting state for each interval,
 }
 \item{endStatusName}{
-Name of the variable that contains the name of end state for each at-risk interval,
+Name of the column that contains the end state for each interval,
 }
   \item{idName}{
 Name of column in \code{dataFr} that identifies individuals,
@@ -47,7 +47,7 @@ Name of column in \code{dataFr} that identifies individuals,
 Smoothing bandwidth parameter,
 }
 \item{weightRange}{
-Range for allowable weights,
+Truncates weights outside this interval,
 }
 \item{willPlotWeights}{
 Plot indicator,
@@ -55,7 +55,6 @@ Plot indicator,
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
-Individuals whos weights lie outside the weightRange are considered outliers and are removed.
 }
 \value{
 %%  ~Describe the value returned
@@ -67,6 +66,7 @@ Longitudinally refined \code{\link{data.table}} of the initial \code{dataFr} wit
 }
 \references{
 %% ~put references to the literature/web site here ~
+\url{https://arxiv.org/abs/1802.01946}
 }
 \author{
 %%  ~~who you are~~
@@ -82,26 +82,52 @@ Pål Christie Ryalen <p.c.ryalen@medisin.uio.no>
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+
+
+data(fr1)
+data(Tmat)
+
+# fr1 is a longitudinal data set with subjects that are diagnosed at time 0, and may
+# be treated as time evolves. Subjects can die before receiving treatment:
+head(fr1)
+
+# Time to treatment and death are confounded by the baseline variable L. We want to
+# mimic a scenario where time to treatment is randomized (and does not depend on L):
+fFit <- aalen(Surv(from,to,to.state =="treat")~1 + L,data=fr1[fr1$from.state == "diag",])
+cfFit <- aalen(Surv(from,to,to.state =="treat")~1,data=fr1[fr1$from.state == "diag",])
+
+# We calculate and plot the weights
+frame1 <- makeContWeights(fFit, cfFit, fr1, "diag", "treat", "to",
+                         "from.state", "to.state", "id", b = 0.4,weightRange = c(0,5), willPlotWeights = T) 
+
+# We fit a weighted model for the outcome. A is a treatment indicator (A=1 means treated).
+a1 <- aalen(Surv(from,to,to.state =="death") ~ 1 + A,data=frame1,weights = frame1$weights)
+
+# We plot the A coefficient from the weighted regression,
+# and compare with the true hypothetical coefficient
+plot(a1$cum[,c(1,3)],type="s",ylim=c(-1.2,0.5),xlim=c(0,5),main="Weighted additive hazard treatment coefficient")
+lines(Tmat,col=2)
+legend("bottomleft",c("weighted estimate","hypothetical treatment coef"),lty=1,col=c(1,2),bty="n")
+
+
 
 data(fFrame)
-data(cfFrame)
 
-faFit <- aalen(Surv(from,to,to.state=="Censored") ~ 1 + u, data = fFrame,resample.iid = 1 ,n.sim=0)
-cfaFit <- aalen(Surv(from,to,to.state=="Censored") ~ 1, data = fFrame,resample.iid = 1,n.sim=0)
+# Next we consider an example with dependent censoring.
+# Subjects are censored depending on a baseline variable u. We wish to mimic the
+# cumulative hazard for death we would have seen if the censoring were independent.
+
+faFit <- aalen(Surv(from,to,to.state=="Censored") ~ 1 + u, data = fFrame)
+cfaFit <- aalen(Surv(from,to,to.state=="Censored") ~ 1, data = fFrame)
 
 frame <- makeContWeights(faFit,cfaFit,fFrame,"Alive","Censored","to","from.state","to.state","id",100)
 
 fMod <- aalen(Surv(from,to,to.state=="Dead")~1,data=fFrame)
 wMod <- aalen(Surv(from,to,to.state=="Dead")~1,data=frame,weights = frame$weights)
-cfMod <- aalen(Surv(from,to,to.state=="Dead")~1,data=cfFrame)
 
 plot(fMod$cum,type="s",main="Nelson-Aalen for death",ylab="")
-lines(cfMod$cum,type="s",col="blue")
 lines(wMod$cum,type="s",col="red")
-legend("topleft",c("factual","counterfactual","weighted factual"),lty=1,col=c(1,"blue","red"),bty="n")
+legend("topleft",c("factual","weighted factual"),lty=1,col=c(1,"red"),bty="n")
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
