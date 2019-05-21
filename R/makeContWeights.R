@@ -49,8 +49,8 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,stopTimeN
         Table[,weights:=naReplace(weights),by=id]
 
         # Truncate weights that are outside a given range
-        Table$weights[Table$weights < weightRange[1]] <- weightRange[1]
         Table$weights[Table$weights > weightRange[2]] <- weightRange[2]
+        Table$weights[Table$weights < weightRange[1]] <- weightRange[1]
         
         # Optional plot of the weight trajectories
         if(willPlotWeights == T)
