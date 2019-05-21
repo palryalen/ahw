@@ -7,6 +7,7 @@ plotContWeights <- function(fr,stopTimeName="to",startStatusName="from.state",en
         fr <- as.data.table(fr)
         tms <- sort(unique(fr$to))
         tmx <- max(tms)
+        
 
         idNs <- unique(fr$id)
         numIds <- length(idNs)
