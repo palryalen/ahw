@@ -19,7 +19,7 @@ plotContWeights <- function(fr,stopTimeName="to",startStatusName="from.state",en
         wt <- naReplace(wt)
         # wt <- na.locf0(wt)
         wpr <- wt
-        
+         
         ylm <- c(max(c(0, min(fr$weights))), min(c(5, max(fr$weights))))
         plot(tms,wt,type="l",xlim=c(0,tmx),ylim=ylm,col="grey",xlab="time",ylab="weights")
         for(i in 2:numIds){
