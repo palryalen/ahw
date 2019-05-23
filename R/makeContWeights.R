@@ -1,5 +1,5 @@
 
-makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,stopTimeName,startStatusName,endStatusName,idName,b,weightRange = c(0,10),willPlotWeights=T){
+makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,startTimeName,stopTimeName,startStatusName,endStatusName,idName,b,weightRange = c(0,10),willPlotWeights=T){
         
         if(class(faFit) != "aalen" | class(cfaFit) != "aalen")
           stop("The survival fits must be of type aalen.",call. = F)
@@ -7,14 +7,14 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,stopTimeN
           stop("The data.table package is needed for this function to work. Please install it.",call. = F)
   
         # Making new names for convenience
-        namesMatch <- match(c(startStatusName,endStatusName,stopTimeName,idName),names(dataFr))
+        namesMatch <- match(c(startStatusName,endStatusName,startTimeName,stopTimeName,idName),names(dataFr))
         saveNames <- names(dataFr)[namesMatch]
-        names(dataFr)[namesMatch] <- c("from.state","to.state","to","id")
+        names(dataFr)[namesMatch] <- c("from.state","to.state","from","to","id")
         
         dataFr <- as.data.table(dataFr)
 
         # Add noise to tied times
-        dataFr <- addNoiseAtEventTimes(dataFr,"id","from","to")
+        dataFr <- addNoiseAtEventTimes(dataFr)
         
         # data frame to get predictions along
         wtFrame <- dataFr[dataFr$from.state %in% atRiskState,]
@@ -31,6 +31,7 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,stopTimeN
         sortedEventTimes <- sort(eventTimes)
         
         # Obtain estimated weights
+        fPred<- pft;cfPred  <- cpft
         weightFrame <- weightPredict(pft,cpft,wtFrame,ids,eventTimes,eventIds,b)
 
         # Refining the data.frame for individuals at risk
@@ -49,15 +50,15 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,stopTimeN
         Table[,weights:=naReplace(weights),by=id]
 
         # Truncate weights that are outside a given range
-        Table$weights[Table$weights > weightRange[2]] <- weightRange[2]
         Table$weights[Table$weights < weightRange[1]] <- weightRange[1]
+        Table$weights[Table$weights > weightRange[2]] <- weightRange[2]
         
         # Optional plot of the weight trajectories
         if(willPlotWeights == T)
                 plotContWeights(Table)
         
         # Switching names back
-        namesMatch <- match(c("from.state","to.state","to","id"),names(Table))
+        namesMatch <- match(c("from.state","to.state","from","to","id"),names(Table))
         names(Table)[namesMatch] <- saveNames
         
         return(Table)

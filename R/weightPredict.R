@@ -53,6 +53,7 @@ weightPredict <- function(fPred,cfPred,wtFrame,ids,eventTimes,eventIds,b){
         predTable[,EventTimes:=0]
         predTable[,event:=0]
         predTable[,EventId:=1*(id%in%eventIds),by=id]
+        
         predTable[EventId==1,EventTimes:=eventTimes[eventIds==id],by=id]
         predTable[EventId==1,event:= 1*(EventTimes == to)]
         predTable[,takeOut:=1*(to%in%eventTimes)]

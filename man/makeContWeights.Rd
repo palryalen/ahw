@@ -97,17 +97,20 @@ fFit <- aalen(Surv(from,to,to.state =="treat")~1 + L,data=fr1[fr1$from.state == 
 cfFit <- aalen(Surv(from,to,to.state =="treat")~1,data=fr1[fr1$from.state == "diag",])
 
 # We calculate and plot the weights
-frame1 <- makeContWeights(fFit, cfFit, fr1, "diag", "treat", "to",
-                         "from.state", "to.state", "id", b = 0.4,weightRange = c(0,5), willPlotWeights = T) 
+frame1 <- makeContWeights(fFit, cfFit, fr1, "diag", "treat", "from", "to",
+                         "from.state", "to.state", "id", b = 0.4,
+                         weightRange = c(0,5)) 
 
 # We fit a weighted model for the outcome. A is a treatment indicator (A=1 means treated).
 a1 <- aalen(Surv(from,to,to.state =="death") ~ 1 + A,data=frame1,weights = frame1$weights)
 
 # We plot the A coefficient from the weighted regression,
 # and compare with the true hypothetical coefficient
-plot(a1$cum[,c(1,3)],type="s",ylim=c(-1.2,0.5),xlim=c(0,5),main="Weighted additive hazard treatment coefficient")
+plot(a1$cum[,c(1,3)],type="s",ylim=c(-1.2,0.5),xlim=c(0,5),
+main="Weighted additive hazard treatment coefficient")
 lines(Tmat,col=2)
-legend("bottomleft",c("weighted estimate","hypothetical treatment coef"),lty=1,col=c(1,2),bty="n")
+legend("bottomleft",c("weighted estimate","hypothetical treatment coef")
+,lty=1,col=c(1,2),bty="n")
 
 
 
@@ -120,7 +123,8 @@ data(fFrame)
 faFit <- aalen(Surv(from,to,to.state=="Censored") ~ 1 + u, data = fFrame)
 cfaFit <- aalen(Surv(from,to,to.state=="Censored") ~ 1, data = fFrame)
 
-frame <- makeContWeights(faFit,cfaFit,fFrame,"Alive","Censored","to","from.state","to.state","id",100)
+frame <- makeContWeights(faFit,cfaFit,fFrame,"Alive","Censored","from","to","from.state",
+"to.state","id",100)
 
 fMod <- aalen(Surv(from,to,to.state=="Dead")~1,data=fFrame)
 wMod <- aalen(Surv(from,to,to.state=="Dead")~1,data=frame,weights = frame$weights)

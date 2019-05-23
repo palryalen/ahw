@@ -1,3 +1,6 @@
 exportPattern("^[[:alpha:]]+")
 useDynLib(ahw)
 import(data.table)
+
+importFrom("graphics", "lines", "plot")
+importFrom("stats", "predict", "runif", "weights")

@@ -54,12 +54,7 @@
   \seealso{
     %% ~~objects to See Also as \code{\link{help}}, ~~~
   }
-\examples{
-  frame <- data.frame(id=c(1,1),from=c(0,1),to=c(1,1))
-  noTiesFrame <- addNoiseAtEventTimes(frame,"id","from","to")
-  noTiesFrame
-  
-}
+
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
