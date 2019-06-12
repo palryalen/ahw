@@ -18,13 +18,15 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,startTime
         
         # data frame to get predictions along
         wtFrame <- dataFr[dataFr$from.state %in% atRiskState,]
+        wtFrame$rowNum <- 1:nrow(wtFrame)
         
         
         pft <- predict(faFit,newdata=wtFrame,n.sim=0,se=F,resample.iid=0)
         cpft <- predict(cfaFit,newdata=wtFrame,n.sim=0,se=F,resample.iid=0)
         
         ids <- unique(dataFr[,idName,with=F])
-        eventIds <- wtFrame$id[wtFrame$to.state %in% eventState]
+        # eventIds <- wtFrame$id[wtFrame$to.state %in% eventState]
+        eventRowNums <- wtFrame$rowNum[wtFrame$to.state %in% eventState]
         
         # Times we want to estimate the weights at
         eventTimes <- wtFrame$to[wtFrame$to.state %in% eventState]
@@ -32,7 +34,7 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,startTime
         
         # Obtain estimated weights
         fPred<- pft;cfPred  <- cpft
-        weightFrame <- weightPredict(pft,cpft,wtFrame,ids,eventTimes,eventIds,b)
+        weightFrame <- weightPredict(pft,cpft,wtFrame,ids,eventTimes,eventRowNums,b)
 
         # Refining the data.frame for individuals at risk
         Table <- refineTable(dataFr,atRiskState,eventState)
