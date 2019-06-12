@@ -31,4 +31,5 @@ Maintainer: \packageMaintainer{ahw}
 ~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
 }
 \examples{
+
 }

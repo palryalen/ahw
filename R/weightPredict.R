@@ -11,7 +11,11 @@ weightPredict <- function(fPred,cfPred,wtFrame,ids,eventTimes,eventIds,b){
         totTimes <- sort(unique(c(fPredTimes,cfPredTimes,eventTimes)))
         nTimes <- length(totTimes)
         lagtimes <- totTimes-b;lagtimes[lagtimes<0] <- 0
+        lagtimes2 <- totTimes-2*b;lagtimes2[lagtimes2<0] <- 0
+        lagtimes3 <- totTimes-3*b;lagtimes3[lagtimes3<0] <- 0
         lagInds <- sapply(lagtimes,function(tm)max(which(tm >= totTimes)))
+        lagInds2 <- sapply(lagtimes2,function(tm)max(which(tm >= totTimes)))
+        lagInds3 <- sapply(lagtimes3,function(tm)max(which(tm >= totTimes)))
         
         sortedEventTimes <- sort(eventTimes)
         
@@ -28,7 +32,9 @@ weightPredict <- function(fPred,cfPred,wtFrame,ids,eventTimes,eventIds,b){
                                 to=rep(totTimes,nrow(wtFrame)),dA_f=0,dA_cf=0,
                                 fEvent=rep(1*(1:nTimes %in% mtf),nrow(wtFrame)),
                                 cfEvent=rep(1*(1:nTimes %in% mtcf),nrow(wtFrame)),
-                                lagInd=rep(lagInds,nrow(wtFrame)))
+                                lagInd=rep(lagInds,nrow(wtFrame)),
+                                lagInd2=rep(lagInds2,nrow(wtFrame)),
+                                lagInd3=rep(lagInds3,nrow(wtFrame)))
         
         predTable[fEvent==1]$dA_f <- dA_f
         predTable[cfEvent==1]$dA_cf <- dA_cf
@@ -62,25 +68,26 @@ weightPredict <- function(fPred,cfPred,wtFrame,ids,eventTimes,eventIds,b){
         # Evaluating predicted cumulative hazards at (lagged) event times
         predTable <- predTable[,c("A_f","A_cf") := .(cumsum(dA_f),cumsum(dA_cf)),by=id]
         predTable[,c("A_f_lag","A_cf_lag") := .(A_f[lagInd],A_cf[lagInd]),by=id]
+        predTable[,c("A_f_lag2","A_cf_lag2") := .(A_f[lagInd2],A_cf[lagInd2]),by=id]
+        predTable[,c("A_f_lag3","A_cf_lag3") := .(A_f[lagInd3],A_cf[lagInd3]),by=id]
         
         # Calculating jump term - contribution from the treatment
-        predTable[,jumpTerm:= (A_cf - A_cf_lag)/(A_f - A_f_lag)]
+        # Using difference method based on 0, 1*b, 2*b, and 3*b steps back in time:
+        predTable[,jumpTerm:= (11/2*A_cf - 3*A_cf_lag - 3/2*A_cf_lag2 - A_cf_lag3)/(11/2*A_f - 3*A_f_lag - 3/2*A_f_lag2 - A_f_lag3)]
         
         # Convex modification for small times
-        predTable[to<b,jumpTerm:=(b-to)/b + (to/b)*jumpTerm]
+        predTable[to<3*b,jumpTerm:=(3*b-to)/(3*b) + (to/(3*b))*jumpTerm]
+        
+        # Checking for "invalid" terms (e.g. 0/0)
+        numNaIds <- nrow(predTable[jumpTerm %in% c(NA,NaN),])
+        if(numNaIds != 0)
+                cat('Warning: b is small for', numNaIds, 'individuals. Consider increasing b. \n')
+        
         
         predTable[,jumpTerm:=jumpTerm - 1]
         predTable[event==0,jumpTerm:=0]
-        
-        # Hack for dealing with possible "invalid" terms (e.g. 0/0)
-        numNaIds <- nrow(predTable[jumpTerm %in% c(NA,NaN),])
-        if(numNaIds != 0)
-                cat('Warning: b is small for', numNaIds, 'individuals \n')
                 
-        predTable[jumpTerm %in% c(NA,NaN),jumpTerm:= 0]
-        predTable[jumpTerm %in% c(Inf),jumpTerm:= 0]
-        
-        # Weight calculation
+        # Weight calculation; solving the SDE
         predTable[,preweight := 1 + dA_f - dA_cf + jumpTerm]
         predTable[,weights:=cumprod(preweight),by=id]
         
