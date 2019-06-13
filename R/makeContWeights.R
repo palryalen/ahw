@@ -35,19 +35,25 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,startTime
         # Obtain estimated weights
         fPred<- pft;cfPred  <- cpft
         weightFrame <- weightPredict(pft,cpft,wtFrame,ids,eventTimes,eventRowNums,b)
-
+        
         # Refining the data.frame for individuals at risk
         Table <- refineTable(dataFr,atRiskState,eventState)
         
         # Merge so that Table includes the weight estimates 
         Table <- merge(Table,weightFrame,by=c("id","from"),all.x=T)
         
-        # Individuals weight constant after time of treatment
-        Table[isAtRiskForTreatment != 1,weights := weights[1],by=id]
+        # idds <- idds+1
+        # plot(Table[id==idds]$to,Table[id==idds]$weights,type="s",ylim=c(0,2))
+        # lines(Table[id==idds]$to,exp(-Table[id==idds]$from * (1.1 - 1))*(1.1/(1))^(Table[id==idds]$from.state==1),col=2,type="l")
         
+        # Individuals weight constant when subjects are not at risk for treatment
+        # Table[isAtRiskForTreatment != 1,weights := weights[1],by=id]
+        Table[isAtRiskForTreatment != 1,weights := weights[1],by=rowNum]
         
+        Table <- subset(Table,select= !(names(Table) %in% c("rowNum","isAtRiskForTreatment")))
         
-        Table <- subset(Table,select= !(names(Table) %in% c("rowNumber","numRep","putEventTimes","isAtRiskForTreatment","eventTime")))
+        # Weights starts at 1
+        Table[,weights := c(1,weights[-1]),by=id]
         
         Table[,weights:=naReplace(weights),by=id]
 

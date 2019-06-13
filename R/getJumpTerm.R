@@ -1,4 +1,4 @@
-getJumpTerm <- function(Table, eventTimes, sortedEventTimes, totTimes, eventRowNums){
+getJumpTerm <- function(Table, eventTimes, sortedEventTimes, totTimes, eventRowNums,dA_f,dA_cf){
   
   WhichEvents <- sapply(eventTimes,function(tm)which(tm==sortedEventTimes)) + length(totTimes)*(0:(length(eventTimes)-1))
   
@@ -6,7 +6,11 @@ getJumpTerm <- function(Table, eventTimes, sortedEventTimes, totTimes, eventRowN
   
   Table[,eventTimePos := 0]
   Table[EventRowNum==1]$eventTimePos[WhichEvents] <- 1
-  Table[EventRowNum==1,eventTimePos := 1+cumsum(eventTimePos)]
+  Table[EventRowNum==1,eventTimePos := cumsum(eventTimePos)]
+  
+  #
+  Table[EventRowNum==1 & eventTimePos == 0,eventTimePos := 1]
+  #
   
   # Table[EventId==1 & eventTimePos == 0,eventTimePos := 1]
   
@@ -20,7 +24,7 @@ getJumpTerm <- function(Table, eventTimes, sortedEventTimes, totTimes, eventRowN
   
   
   
-  Table[EventRowNum==1, keep := 1*(to <= nextEventTime),by=rowNum]
+  # Table[EventRowNum==1, keep := 1*(to <= nextEventTime),by=rowNum]
   
   
   Table[,c("A_f","A_cf") := .(cumsum(dA_f),cumsum(dA_cf)),by=id]
@@ -36,7 +40,7 @@ getJumpTerm <- function(Table, eventTimes, sortedEventTimes, totTimes, eventRowN
   Table[to<3*b,jumpTerm:=(3*b-to)/(3*b) + (to/(3*b))*jumpTerm]
   
   # Checking for "invalid" terms (e.g. 0/0)
-  numNaIds <- nrow(Table[jumpTerm %in% c(NA,NaN),])
+  numNaIds <- length(unique(Table[jumpTerm %in% c(NA,NaN)]$id))
   if(numNaIds != 0)
     cat('Warning: b is small for', numNaIds, 'individuals. Consider increasing b. \n')
   

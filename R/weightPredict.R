@@ -38,15 +38,20 @@ weightPredict <- function(fPred,cfPred,wtFrame,ids,eventTimes,eventRowNums,b){
         
         
         
-        predTable <- getJumpTerm(predTable,eventTimes,sortedEventTimes, totTimes, eventRowNums)
+        predTable <- getJumpTerm(predTable,eventTimes,sortedEventTimes,totTimes, eventRowNums,dA_f,dA_cf)
         
         
         predTable$atRiskFrom <- rep(wtFrame$from,each=nTimes)
         predTable$atRiskTo <- rep(wtFrame$to,each=nTimes)
         
-        predTable[EventRowNum==0,keep := 1*(to >= atRiskFrom & to < atRiskTo)]
+        # predTable[EventRowNum==0,keep := 1*(to >= atRiskFrom & to < atRiskTo)]
+        predTable[,keep := 1*(to > atRiskFrom & to <= atRiskTo)]
         
         predTable <- predTable[keep == 1]
+        
+        ##
+        # predTable[id==1,c("id","to","event","jumpTerm")]
+        ##
         
         # If there are several at risk states for each individual
         # numRepId <- as.numeric(table(wtFrame$id))
@@ -88,7 +93,7 @@ weightPredict <- function(fPred,cfPred,wtFrame,ids,eventTimes,eventRowNums,b){
         predTable[,weights:=cumprod(preweight),by=id]
         
         # predTable <- predTable[takeOut==1,]
-        predTable <- predTable[,names(predTable) %in% c("id","to","weights"),with=F]
+        predTable <- predTable[,names(predTable) %in% c("id","to","weights","rowNum"),with=F]
         
         # Estimators evaluate weights in the left limit:
         names(predTable)[names(predTable)=="to"] <- "from"
