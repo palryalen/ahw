@@ -13,8 +13,9 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,startTime
         
         dataFr <- as.data.table(dataFr)
 
+        # Add check for event ties!
         # Add noise to tied times
-        dataFr <- addNoiseAtEventTimes(dataFr)
+        # dataFr <- addNoiseAtEventTimes(dataFr)
         
         # data frame to get predictions along
         wtFrame <- dataFr[dataFr$from.state %in% atRiskState,]
@@ -36,28 +37,33 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,startTime
         fPred<- pft;cfPred  <- cpft
         weightFrame <- weightPredict(pft,cpft,wtFrame,ids,eventTimes,eventRowNums,b)
         
-        # Refining the data.frame for individuals at risk
+        
+        
+        ####
+        # weightFrame[,numT := .N,by=rowNum]
+        # idds <- idds+1
+        # plot(weightFrame[id==idds]$from,weightFrame[id==idds]$weights,type="s",ylim=c(0,2))
+        # lines(weightFrame[id==idds]$from,exp(-cumsum(diff(c(0,weightFrame[id==idds]$from))*
+        #                                        ( predict(pLspline,weightFrame[id==idds]$from)$y - rep(wtFrame[id==idds]$L,unique(weightFrame[id==idds]$numT))*alpha_l)))
+        #                                      ,type="s",col=2)
+        ####
+        
+        # Refining the data.table for individuals at risk
         Table <- refineTable(dataFr,atRiskState,eventState)
         
         # Merge so that Table includes the weight estimates 
         Table <- merge(Table,weightFrame,by=c("id","from"),all.x=T)
-        
-        # idds <- idds+1
-        # plot(Table[id==idds]$to,Table[id==idds]$weights,type="s",ylim=c(0,2))
-        # lines(Table[id==idds]$to,exp(-Table[id==idds]$from * (1.1 - 1))*(1.1/(1))^(Table[id==idds]$from.state==1),col=2,type="l")
-        
+
         # Individuals weight constant when subjects are not at risk for treatment
-        # Table[isAtRiskForTreatment != 1,weights := weights[1],by=id]
         Table[isAtRiskForTreatment != 1,weights := weights[1],by=rowNum]
         
         Table <- subset(Table,select= !(names(Table) %in% c("rowNum","isAtRiskForTreatment")))
         
-        # Weights starts at 1
+        # The time-dependent weights have initial value 1
         Table[,weights := c(1,weights[-1]),by=id]
-        
         Table[,weights:=naReplace(weights),by=id]
 
-        # Truncate weights that are outside a given range
+        # Truncate weights that are outside the given range weightRange
         Table$weights[Table$weights < weightRange[1]] <- weightRange[1]
         Table$weights[Table$weights > weightRange[2]] <- weightRange[2]
         

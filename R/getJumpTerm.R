@@ -1,26 +1,37 @@
-getJumpTerm <- function(Table, eventTimes, sortedEventTimes, totTimes, eventRowNums,dA_f,dA_cf){
+
+##
+Table <- predTable
+##
+
+getJumpTerm <- function(Table, eventTimes, sortedEventTimes, totTimes, eventRowNums){
   
-  WhichEvents <- sapply(eventTimes,function(tm)which(tm==sortedEventTimes)) + length(totTimes)*(0:(length(eventTimes)-1))
+  WhichEvents <- sapply(eventTimes,function(tm)which(tm==totTimes)) + length(totTimes)*(0:(length(eventTimes)-1))
   
+  # EventRowNum: does the row have an event?
   Table[,EventRowNum:=1*(rowNum%in%eventRowNums),by=id]
   
-  Table[,eventTimePos := 0]
-  Table[EventRowNum==1]$eventTimePos[WhichEvents] <- 1
-  Table[EventRowNum==1,eventTimePos := cumsum(eventTimePos)]
+  # event: if the row has an event, at what event time point?
+  Table[,event := 0]
+  Table[EventRowNum==1]$event[WhichEvents] <- 1
+  # Table[EventRowNum==1,eventTimePos := cumsum(eventTimePos)]
+  # Table[,eventTimePos := eventTimePos + 1]
   
   #
-  Table[EventRowNum==1 & eventTimePos == 0,eventTimePos := 1]
+  # Table[EventRowNum==1 & eventTimePos == 0,eventTimePos := 1]
   #
   
   # Table[EventId==1 & eventTimePos == 0,eventTimePos := 1]
   
-  Table[,event:=0]
-  Table[,nextEventTime := -1]
-  Table[EventRowNum==1,nextEventTime := eventTimes[eventTimePos]]
-  Table[EventRowNum==1,event:=1*(to == nextEventTime)]
+  # event: 
+  # Table[,event:=0]
+  # Table[eventTimePos==1,event:=1]
+  # 
+  # Table[,nextEventTime := -1]
+  # Table[EventRowNum==1,nextEventTime := eventTimes[eventTimePos]]
+  # Table[EventRowNum==1,event:=1*(to == nextEventTime)]
   
-  Table[fEvent==1]$dA_f <- dA_f
-  Table[cfEvent==1]$dA_cf <- dA_cf
+  # Table[fEvent==1]$dA_f <- dA_f
+  # Table[cfEvent==1]$dA_cf <- dA_cf
   
   
   
@@ -37,12 +48,10 @@ getJumpTerm <- function(Table, eventTimes, sortedEventTimes, totTimes, eventRowN
   Table[,jumpTerm:= (11/2*A_cf - 3*A_cf_lag - 3/2*A_cf_lag2 - A_cf_lag3)/(11/2*A_f - 3*A_f_lag - 3/2*A_f_lag2 - A_f_lag3)]
   
   # Convex modification for small times
-  Table[to<3*b,jumpTerm:=(3*b-to)/(3*b) + (to/(3*b))*jumpTerm]
+  # Table[to<3*b,jumpTerm:=(3*b-to)/(3*b) + (to/(3*b))*jumpTerm]
   
-  # Checking for "invalid" terms (e.g. 0/0)
-  numNaIds <- length(unique(Table[jumpTerm %in% c(NA,NaN)]$id))
-  if(numNaIds != 0)
-    cat('Warning: b is small for', numNaIds, 'individuals. Consider increasing b. \n')
+  # Modification for small times
+  Table[to<3*b,jumpTerm:=1 + to^2* sqrt(abs(jumpTerm-1)/(9*b))]
   
   
   Table[,jumpTerm:=jumpTerm - 1]

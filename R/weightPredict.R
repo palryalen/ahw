@@ -26,6 +26,9 @@ weightPredict <- function(fPred,cfPred,wtFrame,ids,eventTimes,eventRowNums,b){
         dA_f <- as.vector(apply(fPred$S0,1,function(rw)-diff(c(0,log(rw)))))
         dA_cf <- as.vector(apply(cfPred$S0,1,function(rw)-diff(c(0,log(rw)))))
         
+        # plot(cfPred$time,-log(cfPred$S0[1,]),type="s",col=2)
+        # lines(fPred$time,-log(fPred$S0[1,]),type="s")
+        
         
         predTable <- data.table(rowNum=rep(1:nrow(wtFrame),each=nTimes),
                                 id=rep(wtFrame$id,each=nTimes),
@@ -36,18 +39,34 @@ weightPredict <- function(fPred,cfPred,wtFrame,ids,eventTimes,eventRowNums,b){
                                 lagInd2=rep(lagInds2,nrow(wtFrame)),
                                 lagInd3=rep(lagInds3,nrow(wtFrame)))
         
+        predTable[fEvent==1]$dA_f <- dA_f
+        predTable[cfEvent==1]$dA_cf <- dA_cf
         
         
-        predTable <- getJumpTerm(predTable,eventTimes,sortedEventTimes,totTimes, eventRowNums,dA_f,dA_cf)
+        ##
+        # predTable[,weights := cumprod(1 - dA_cf + dA_f),by=id]
+        # lines(predTable[id==idds]$to,predTable[id==idds]$weights,type="s",col=4)
+        ##
         
         
-        predTable$atRiskFrom <- rep(wtFrame$from,each=nTimes)
-        predTable$atRiskTo <- rep(wtFrame$to,each=nTimes)
+        ##
+        Table <- predTable
+        ##
         
-        # predTable[EventRowNum==0,keep := 1*(to >= atRiskFrom & to < atRiskTo)]
-        predTable[,keep := 1*(to > atRiskFrom & to <= atRiskTo)]
+        predTable <- getJumpTerm(predTable,eventTimes,sortedEventTimes,totTimes, eventRowNums)
         
-        predTable <- predTable[keep == 1]
+        predTable$rowNumFrom <- rep(wtFrame$from,each=length(totTimes))
+        predTable$rowNumTo <- rep(wtFrame$to,each=length(totTimes))
+        
+        # predTable$atRiskFrom <- rep(wtFrame$from,each=nTimes)
+        # predTable$atRiskTo <- rep(wtFrame$to,each=nTimes)
+        # 
+        # # predTable[EventRowNum==0,keep := 1*(to >= atRiskFrom & to < atRiskTo)]
+        # predTable[,keep := 1*(to > atRiskFrom & to <= atRiskTo)]
+        # 
+        # # predTable[id==1 & to < 1.11,c("atRiskFrom","atRiskTo","to","keep")]
+        # 
+        # predTable <- predTable[keep == 1]
         
         ##
         # predTable[id==1,c("id","to","event","jumpTerm")]
@@ -85,12 +104,42 @@ weightPredict <- function(fPred,cfPred,wtFrame,ids,eventTimes,eventRowNums,b){
         
         # Evaluating predicted cumulative hazards at (lagged) event times
         
+        
+        ####
+        # predTable[,hadEvent := c(0,cumsum(event)[-.N]),by=rowNum]
+        # 
+        # predTable <- predTable[hadEvent == 0,]
+        # 
+        # predTable[event==0,jumpTerm:=0]
+        ####
+
+        
+        # Other approach: remove rows using rowNumFrom & rowNumTo
+        predTable <- predTable[to >= rowNumFrom & to <= rowNumTo]
+        
         predTable[event==0,jumpTerm:=0]
+        
+        # Checking for "invalid" terms (e.g. 0/0)
+        numNaIds <- length(unique(predTable[jumpTerm %in% c(NA,NaN)]$id))
+        if(numNaIds != 0)
+          cat('Warning: b is small for', numNaIds, 'individuals. Consider increasing b. \n')
                 
         # Weight calculation; solving the SDE
         predTable[,preweight := 1 + dA_f - dA_cf + jumpTerm]
         
         predTable[,weights:=cumprod(preweight),by=id]
+        
+        
+        #
+        # predTable[,A := cumsum(dA_f),by=id];predTable[,A_cf := cumsum(dA_cf),by=id]
+        # plot(predTable[id==idds]$to,predTable[id==idds]$A,type="s")
+        # lines(predTable[id==idds]$to,predTable[id==idds]$A_cf,type="s",col=4)
+        #
+        ####
+        # plot(predTable[id==idds]$to,predTable[id==idds]$weights,type="s",ylim=c(0,2))
+        # lines(predTable[id==idds]$to,exp(-predTable[id==idds]$to*al/2),type="s",col=2)
+        
+        ####
         
         # predTable <- predTable[takeOut==1,]
         predTable <- predTable[,names(predTable) %in% c("id","to","weights","rowNum"),with=F]

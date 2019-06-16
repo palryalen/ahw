@@ -15,7 +15,6 @@ refineTable <- function(dataFr,atRiskState,eventState){
   baseTable[,numRep := 1]
   
   # When the subjects are at risk of being treated, they should have one row for treatment time in the population:
-  # baseTable[isAtRiskForTreatment==1,numRep := as.numeric(sum(from <= fineRefineTimes & to > fineRefineTimes)),by=rowNumber]
   baseTable[isAtRiskForTreatment==1,numRep := as.numeric(sum(from < fineRefineTimes & to >= fineRefineTimes)),by=rowNumber]
   
   # to.state hack (CHECK IF IT CAN BE IMPROVED)
