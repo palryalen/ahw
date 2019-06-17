@@ -13,10 +13,7 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,startTime
         
         dataFr <- as.data.table(dataFr)
 
-        # Add check for event ties!
-        # Add noise to tied times
-        # dataFr <- addNoiseAtEventTimes(dataFr)
-        
+
         # data frame to get predictions along
         wtFrame <- dataFr[dataFr$from.state %in% atRiskState,]
         wtFrame$rowNum <- 1:nrow(wtFrame)
@@ -26,7 +23,7 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,startTime
         cpft <- predict(cfaFit,newdata=wtFrame,n.sim=0,se=F,resample.iid=0)
         
         ids <- unique(dataFr[,idName,with=F])
-        # eventIds <- wtFrame$id[wtFrame$to.state %in% eventState]
+
         eventRowNums <- wtFrame$rowNum[wtFrame$to.state %in% eventState]
         
         # Times we want to estimate the weights at
@@ -36,18 +33,7 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,startTime
         # Obtain estimated weights
         fPred<- pft;cfPred  <- cpft
         weightFrame <- weightPredict(pft,cpft,wtFrame,ids,eventTimes,eventRowNums,b)
-        
-        
-        
-        ####
-        # weightFrame[,numT := .N,by=rowNum]
-        # idds <- idds+1
-        # plot(weightFrame[id==idds]$from,weightFrame[id==idds]$weights,type="s",ylim=c(0,2))
-        # lines(weightFrame[id==idds]$from,exp(-cumsum(diff(c(0,weightFrame[id==idds]$from))*
-        #                                        ( predict(pLspline,weightFrame[id==idds]$from)$y - rep(wtFrame[id==idds]$L,unique(weightFrame[id==idds]$numT))*alpha_l)))
-        #                                      ,type="s",col=2)
-        ####
-        
+
         # Refining the data.table for individuals at risk
         Table <- refineTable(dataFr,atRiskState,eventState)
         

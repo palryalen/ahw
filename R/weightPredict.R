@@ -26,10 +26,7 @@ weightPredict <- function(fPred,cfPred,wtFrame,ids,eventTimes,eventRowNums,b){
         dA_f <- as.vector(apply(fPred$S0,1,function(rw)-diff(c(0,log(rw)))))
         dA_cf <- as.vector(apply(cfPred$S0,1,function(rw)-diff(c(0,log(rw)))))
         
-        # plot(cfPred$time,-log(cfPred$S0[1,]),type="s",col=2)
-        # lines(fPred$time,-log(fPred$S0[1,]),type="s")
-        
-        
+
         predTable <- data.table(rowNum=rep(1:nrow(wtFrame),each=nTimes),
                                 id=rep(wtFrame$id,each=nTimes),
                                 to=rep(totTimes,nrow(wtFrame)),dA_f=0,dA_cf=0,
@@ -43,75 +40,11 @@ weightPredict <- function(fPred,cfPred,wtFrame,ids,eventTimes,eventRowNums,b){
         predTable[cfEvent==1]$dA_cf <- dA_cf
         
         
-        ##
-        # predTable[,weights := cumprod(1 - dA_cf + dA_f),by=id]
-        # lines(predTable[id==idds]$to,predTable[id==idds]$weights,type="s",col=4)
-        ##
-        
-        
-        ##
-        Table <- predTable
-        ##
-        
         predTable <- getJumpTerm(predTable,eventTimes,sortedEventTimes,totTimes, eventRowNums)
         
         predTable$rowNumFrom <- rep(wtFrame$from,each=length(totTimes))
         predTable$rowNumTo <- rep(wtFrame$to,each=length(totTimes))
         
-        # predTable$atRiskFrom <- rep(wtFrame$from,each=nTimes)
-        # predTable$atRiskTo <- rep(wtFrame$to,each=nTimes)
-        # 
-        # # predTable[EventRowNum==0,keep := 1*(to >= atRiskFrom & to < atRiskTo)]
-        # predTable[,keep := 1*(to > atRiskFrom & to <= atRiskTo)]
-        # 
-        # # predTable[id==1 & to < 1.11,c("atRiskFrom","atRiskTo","to","keep")]
-        # 
-        # predTable <- predTable[keep == 1]
-        
-        ##
-        # predTable[id==1,c("id","to","event","jumpTerm")]
-        ##
-        
-        # If there are several at risk states for each individual
-        # numRepId <- as.numeric(table(wtFrame$id))
-        
-        
-        
-        
-        # to <- predTable[id==idds]$to
-        # predTable[,numIdRow:= rep(cumsum(numRepId),times=nTimes*numRepId)]
-        # predTable[,keep:=1*(to>= wtFrame$from[rowNum[1]==wtFrame$rowNum] & 
-        #                             to< wtFrame$to[rowNum[1]==wtFrame$rowNum]),by=rowNum]
-        # predTable[keep==0 & numIdRow==rowNum,keep:=1*(to>= max(wtFrame$to[id[1]==wtFrame$id])),by=id]
-        # 
-        # # NB! Not keep every row that starts at to=0!
-        # # predTable[to==0,keep:=1]
-        # predTable[to==0 & numIdRow != rowNum,keep:=1]
-        # 
-        # 
-        # predTable <- predTable[keep==1]
-        # 
-        # predTable[,EventTimes:=0]
-        # predTable[,event:=0]
-        # predTable[,EventId:=1*(id%in%eventIds),by=id]
-        # 
-        # # predTable[EventId==1,EventTimes:=eventTimes[eventIds==id],by=id]
-        # predTable[EventId==1]$EventTimes <- rep(eventTimes)
-        # 
-        # predTable[EventId==1,event:= 1*(EventTimes == to)]
-        # predTable[,takeOut:=1*(to%in%eventTimes)]
-        # predTable[to==0,takeOut:=1]
-        
-        # Evaluating predicted cumulative hazards at (lagged) event times
-        
-        
-        ####
-        # predTable[,hadEvent := c(0,cumsum(event)[-.N]),by=rowNum]
-        # 
-        # predTable <- predTable[hadEvent == 0,]
-        # 
-        # predTable[event==0,jumpTerm:=0]
-        ####
 
         
         # Other approach: remove rows using rowNumFrom & rowNumTo
@@ -129,19 +62,6 @@ weightPredict <- function(fPred,cfPred,wtFrame,ids,eventTimes,eventRowNums,b){
         
         predTable[,weights:=cumprod(preweight),by=id]
         
-        
-        #
-        # predTable[,A := cumsum(dA_f),by=id];predTable[,A_cf := cumsum(dA_cf),by=id]
-        # plot(predTable[id==idds]$to,predTable[id==idds]$A,type="s")
-        # lines(predTable[id==idds]$to,predTable[id==idds]$A_cf,type="s",col=4)
-        #
-        ####
-        # plot(predTable[id==idds]$to,predTable[id==idds]$weights,type="s",ylim=c(0,2))
-        # lines(predTable[id==idds]$to,exp(-predTable[id==idds]$to*al/2),type="s",col=2)
-        
-        ####
-        
-        # predTable <- predTable[takeOut==1,]
         predTable <- predTable[,names(predTable) %in% c("id","to","weights","rowNum"),with=F]
         
         # Estimators evaluate weights in the left limit:
