@@ -23,7 +23,8 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,startTime
         pft <- predict(faFit,newdata=wtFrame,n.sim=0,se=F,resample.iid=0)
         cpft <- predict(cfaFit,newdata=wtFrame,n.sim=0,se=F,resample.iid=0)
         
-        ids <- unique(dataFr[,idName,with=F])
+        # ids <- unique(dataFr[,idName,with=F])
+        ids <- unique(dataFr$id)
         eventIds <- wtFrame$id[wtFrame$to.state %in% eventState]
         
         # Times we want to estimate the weights at
