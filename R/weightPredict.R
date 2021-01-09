@@ -78,14 +78,13 @@ weightPredict <- function(fPred,cfPred,wtFrame,ids,eventTimes,eventIds,b){
         # Convex modification for small times
         predTable[to<3*b,jumpTerm:=(3*b-to)/(3*b) + (to/(3*b))*jumpTerm]
         
-        # Checking for "invalid" terms (e.g. 0/0)
-        numNaIds <- nrow(predTable[jumpTerm %in% c(NA,NaN),])
-        if(numNaIds != 0)
-                cat('Warning: b is small for', numNaIds, 'individuals. Consider increasing b. \n')
-        
-        
         predTable[,jumpTerm:=jumpTerm - 1]
         predTable[event==0,jumpTerm:=0]
+                                 
+        # Checking for "invalid" terms (e.g. 0/0)
+        numNaIds <- nrow(predTable[jumpTerm %in% c(NA,NaN,Inf),])
+        if(numNaIds != 0)
+                cat('Warning: b is small for', numNaIds, 'individuals. Consider increasing b. \n')
                 
         # Weight calculation; solving the SDE
         predTable[,preweight := 1 + dA_f - dA_cf + jumpTerm]
