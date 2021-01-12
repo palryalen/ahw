@@ -55,6 +55,17 @@
     %% ~~objects to See Also as \code{\link{help}}, ~~~
   }
 
+\examples{
+
+
+data(fr1)
+
+fr1 <- addNoiseAtEventTimes(fr1)
+
+head(fr1)
+
+}
+
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")

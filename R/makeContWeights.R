@@ -13,11 +13,18 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,startTime
         
         dataFr <- as.data.table(dataFr)
 
-        # Add noise to tied times
-        dataFr <- addNoiseAtEventTimes(dataFr)
-        
         # data frame to get predictions along
         wtFrame <- dataFr[dataFr$from.state %in% atRiskState,]
+        
+        # Times we want to estimate the weights at
+        eventTimes <- wtFrame$to[wtFrame$to.state %in% eventState]
+        
+        # Checking whether there are ties in the input data
+        if(length(unique(eventTimes)) != length(eventTimes)){
+          stop("Error! Remove ties from the data. Apply function addNoiseAtEventTimes() to dataFr and try again.
+               Run example(makeContWeights) for an example.")
+        }
+
         
         
         pft <- predict(faFit,newdata=wtFrame,n.sim=0,se=F,resample.iid=0)
@@ -27,9 +34,7 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,startTime
         ids <- unique(dataFr$id)
         eventIds <- wtFrame$id[wtFrame$to.state %in% eventState]
         
-        # Times we want to estimate the weights at
-        eventTimes <- wtFrame$to[wtFrame$to.state %in% eventState]
-        sortedEventTimes <- sort(eventTimes)
+        
         
         # Obtain estimated weights
         fPred<- pft;cfPred  <- cpft

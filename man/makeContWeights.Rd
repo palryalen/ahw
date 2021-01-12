@@ -91,6 +91,10 @@ data(Tmat)
 # be treated as time evolves. Subjects can die before receiving treatment:
 head(fr1)
 
+# The method assumes there are no tied event times in the observed data. Although there are no
+# tied event times in fr1, we use the function addNoiseAtEventTimes() for illustration here
+fr1 <- addNoiseAtEventTimes(fr1)
+
 # Time to treatment and death are confounded by the baseline variable L. We want to
 # mimic a scenario where time to treatment is randomized (and does not depend on L):
 fFit <- aalen(Surv(from,to,to.state =="treat")~1 + L,data=fr1[fr1$from.state == "diag",])
