@@ -2,7 +2,7 @@
 # Assumes fr is data.table on long format with "id", "from", and "to" in the column names.
 addNoiseAtEventTimes <- function(fr){
         
-        if(!all(c("id","from","to") %in% names(fr)) & ("data.table" %in% class(fr))){
+        if(!all(c("id","from","to") %in% names(fr)) | !("data.table" %in% class(fr))){
                 stop("Error! Try again with input data as data.table on long format 
                      with 'id', 'from', and  'to' in the column names.")
         }
