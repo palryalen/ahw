@@ -3,16 +3,15 @@ makeContWeights <- function(faFit,cfaFit,dataFr,atRiskState,eventState,startTime
         
         if(class(faFit) != "aalen" | class(cfaFit) != "aalen")
           stop("The survival fits must be of type aalen.",call. = F)
-        if(!requireNamespace("data.table",quietly = T))
-          stop("The data.table package is needed for this function to work. Please install it.",call. = F)
+        if(!("data.table" %in% class(dataFr))){
+          stop("Error! Try again with input data as data.table")
+        }
   
         # Making new names for convenience
         namesMatch <- match(c(startStatusName,endStatusName,startTimeName,stopTimeName,idName),names(dataFr))
         saveNames <- names(dataFr)[namesMatch]
         names(dataFr)[namesMatch] <- c("from.state","to.state","from","to","id")
         
-        dataFr <- as.data.table(dataFr)
-
         # data frame to get predictions along
         wtFrame <- dataFr[dataFr$from.state %in% atRiskState,]
         

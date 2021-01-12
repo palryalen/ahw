@@ -93,6 +93,7 @@ head(fr1)
 
 # The method assumes there are no tied event times in the observed data. Although there are no
 # tied event times in fr1, we use the function addNoiseAtEventTimes() for illustration here
+fr1 <- as.data.table(fr1)
 fr1 <- addNoiseAtEventTimes(fr1)
 
 # Time to treatment and death are confounded by the baseline variable L. We want to
